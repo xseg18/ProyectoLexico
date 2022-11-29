@@ -1,73 +1,29 @@
-Compilador CHILERO (primera fase)
-=================================
+Para crear la solucion del proyecto, primero se diseñaron las especificaciones léxicas en el estado inicial del lenguaje chilero, basandose en los tokens descritos en el archivo TokenConstants.
+Sse tomaron en cuenta las reglas del lenguaje Cool dentro de su manual de usuario, donde indica que todas sus palabras reservadas son case insensitive, lo cual también se aplicó para sus contrapartes en español. No se realizó una traducción como tal, sino que al momento de definir las especificaciones se hicieron tanto en español como en ingles bajo la misma regla. Todas las reglas se realizaron bajo la misma sintaxis de [letraMayuscula,letraMinuscula] con ligeras variaciones dependiendo de la palabra reservada por motivos de simplificación. Después se continuaron con los símbolos u operadores validados por el lenguaje y por último las constantes de tipo int, bool o string que se agregaron a sus respectivas AbstractTables.
 
-Al iniciar la tarea, su repositorio debera contener los siguientes archivos y directorios importantes:
+Al empezar con los strings, y según el manual de Jflex para realizar una solución correcta, se creó el estado adicional "String", el cual iniciaría al encontrar una comilla doble dentro del programa. El estado se dividió en secciones según: caracter nulo, caracter comilla doble, enter, escaped enter y caracteres aceptados. En cada uno de estos "sub-estados" se desarrolla cada una de las situaciones a suceder en caso encontrar los caracteres descritos. Para el caracter nulo y en caso de que dentro del string hubieran más de 1025 caracteres, se creo el estado StringRecover, el cual hace que el analizador léxico continue consumiendo información a pesar de caer en error, según la documentación del proyecto. Si se encontraban carácteres aceptados se agregaban a la varible string_buff el cual llevaba el registro de todo el contenido del string.
 
-* Makefile
-* README.md
-* lexer-chilero
-* lexer-chilero/src/main/java/gt/edu/url/compiler
-* lexer-chilero/src/main/jflex
-* cooltests
+Al terminar con esto se crearon los estados para los comentarios:
+- CommentP, que se encargaba de los comentarios con (* 
+- CommentM que miraba por los comentarios con --. 
 
-`Makefile` contiene objetivos para compilar y ejecutar su programa. NO MODIFICAR.
+Ambos omiten el contenido dentro o despues de estos simbolos de definicióny retornaba al estado incial, al encontrar enter en el caso de CommentM, o al encontrar todos los parentesis de cierre y apertura con apoyo de una variable auxiliar llamada "counter" en CommentP. Al momento de encontrar un parentesis de cierre fuera del estado CommentP (es decir en el estado inicial) este autómaticamente devuelve Error como "Unmatched parenthesis".
 
-`README.md` contiene esta información. 
+Los errores de EOF dentro de comentarios o strings, se manejaron dentro de la configuración "eofval" donde por medio de un switch case de los estados disponibles, se dispuso que, primero se regresará al estado incial para seguir consumiendo información y que no se quedara dentro del error, y despues, retornaría el mensaje de error adecuado según el estado donde se encontró, para que por último retornara el token constant de EOF.
 
-`lexer-chilero/src/main/jflex/simpletokenizer.lex` es un archivo esqueleto para la especificación del analizador léxico. Debera completarlo con expresiones, patrones y acciones.
+Del mismo modo, para probar el correcto funcionamiento de Lexer.java, dentro de App.java se realizó la implementación individual de un lector de pruebas unitarias y de archivos para la terminal con PicoCLI basandose en el código del Laboratorio #5.
 
-Dentro de `cooltests` encontrará tres programas de prueba:
+Después de completar la creación de jflex para Chilero y el lector de pruebas unitarias y de archivos, se empezaron a ejecutar las pruebas con test.cl el cúal contenía 3 errores: 
+1. caracteres no definidos "[]"
+2. caracter no definido ">"
+3. EOF in comment.
 
-1. `test.cl` en el cual puede probar análisis léxico y recuperación de errores. Este programa NO es correcto y le puede servir para verificar que su analizador léxico detecte correctamente los errores. Así mismo debera modificarlo para que sea correcto.
-2. `factloop.cl` es una calculadora de factorial.
-3. `stack.cl` es una solución a la máquina de pila previamente elaborada en el laboratorio.
+Para corregir estos errores, primero se debía identificar que función se suponía tenían que realizar los símbolos no válidos y completar el comentario faltante.
+Los símbolos "[]" estaban siendo utilizados para un array de tipo númerico. Se reemplazaron por parentesis, siguiendo la documentación de cool para referirse a un objeto.
+El operador ">" se utilizaba para comparar que la variable countdown fuera mayor a 0 dentro de un ciclo while. Para solucionar el fallo se refactorizó la condición del ciclo para que validara si cero era menor a countdown.
+Por último, en la línea 93 se cerró el comentario inciado.
+Al correr nuevamente el analizador no se encontró ningún error y se obtuvo la salida esperada al correr el programa.
 
-`lexer-chilero/src/main/java/gt/edu/url/TokenConstants.java` contiene definiciones de constantes que utilizan casi todas las partes del compilador. NO MODIFICAR.
+Dentro de las pruebas también se realizaron pruebas unitarias tanto en inglés como en español y lectura de archivos aparte de los ya incluidos en el directorio cooltests. Comprobando nuevamente el buen funcionamiento del analizador léxico.
 
-`lexer-chilero/src/main/java/gt/edu/url/Table.java` y `lexer-chilero/src/main/java/gt/edu/url/Symbol.java` contienen tablas de cadenas y símbolos útiles en las siguientes fases del compilador NO MODIFICAR.
-
-`lexer-chilero/src/main/java/gt/edu/url/Utilities.java` contiene varias funciones de soporte utilizadas por el controlador lexer principal (Lexer.java). NO MODIFICAR.
-
-`mycoolc` es un script de shell que une las fases del compilador que utiliza pipes de Unix en lugar de vincular estáticamente el código.  Si bien es ineficiente, esta arquitectura facilita la combinación y combinación los componentes que escribe con los del compilador del curso. NO MODIFICAR.
-
-Tareas principales
-------------------
-
-1. Implemente el analizador léxico para COOL y su dialecto CHILERO en el archivo `lexer-chilero/src/main/jflex/simpletokenizer.lex`.
-2. En la última sección de este archivo debera redactar una explicación clara de su solución en lenguaje académico (formal, en tercera persona, directo). Debera explicar las decisiones de diseño, como implementó el soporte al dialecto, si necesitó estados intermedios en JFlex, explicar por qué su código es correcto y que modificaciones se realizaron sobre `test.cl` para que fuera un programa correcto.  Asi mismo debe comentar el código que considere conveniente en JFlex.
-3. En el archivo `lexer-chilero/src/main/java/gt/edu/url/Lexer.java` encontrará una implementación de un método principal que invoca a su lexer e imprime los tokens que se detectan. Esta salida es obligatoria para las siguientes fases del proyecto. Debera escribir su propia versión utilizando PicoCLI tal y como se vio en el laboratorio. Esta versión también debera soportar análisis individual de Tokens.
-4. El día de la entrega/calificación su instructor le indicará algunas modificaciones con pruebas adicionales (programas en español, ejecuciones de lexer en línea de comandos). El cual usted debera aceptar para comprobar el análisis de su solución.
-
-Note que el autograder proporcionado con este repositorio incluye únicamente pruebas sobre stack y factorial
-
-Instrucciones de uso del makefile
----------------------------------
-
-El archivo Makefile incluido en su repositorio presenta algunas tareas útiles que pueden ser invocadas directamente en la línea de comandos.
-
-Para compilar su programa ejecute
-
-> make compile
-
-Para generar un script `lexer` que ejecute su analizador léxico, ejecute
-
-> make lexer
-
-Para limpiar todo el proyecto ejecute:
-
-> make clean
-
-Así mismo existen dos fases adicionales que ejecutan en secuencia varios pasos para una prueba completa de su solución.
-
-La primera es `make dofactorial` la cual limpia su proyecto, ejecuta la compilación, genera el lexer y ejecuta una prueba del programa `factloop.cl`.
-
-La segunda es `make dostack` la cual limpia su proyecto, ejecuta la compilación, genera el lexer y ejecuta una prueba del programa `stack.cl`.
-
-Si cree que su analizador léxico es correcto, puede ejecutar `mycoolc` el cual une SU analizador léxico con, los analizadores sintácticos, semánticos, generador de código y optimizador de cool. 
-
-Si su analizador léxico se comporta de una manera inesperada, puede obtener errores en cualquier lugar, es decir, durante análisis sintáctico, durante el análisis semántico, durante la generación de código o solo cuando ejecuta el código producido en spim. 
-
-¡Éxitos!
-
-Redacción para primera fase
----------------------------
+Para culminar con la solución y después de terminar con todas las pruebas y verificación de errores, se unió el analizador léxico creado junto con el compilador de coolc por medio del comando mycoolc.
