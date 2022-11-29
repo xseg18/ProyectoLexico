@@ -1,0 +1,16 @@
+/media/sf_Compis/Proyecto Lexico/lexer-chilero/src/main/java/gt/edu/url/compiler/AbstractSymbol.java
+/media/sf_Compis/Proyecto Lexico/lexer-chilero/src/main/java/gt/edu/url/compiler/Utilities.java
+/media/sf_Compis/Proyecto Lexico/lexer-chilero/src/main/java/gt/edu/url/compiler/Lexer.java
+/media/sf_Compis/Proyecto Lexico/lexer-chilero/src/main/java/gt/edu/url/compiler/StringTable.java
+/media/sf_Compis/Proyecto Lexico/lexer-chilero/src/main/java/gt/edu/url/compiler/BoolConst.java
+/media/sf_Compis/Proyecto Lexico/lexer-chilero/src/main/java/gt/edu/url/compiler/CgenSupport.java
+/media/sf_Compis/Proyecto Lexico/lexer-chilero/src/main/java/gt/edu/url/compiler/IntTable.java
+/media/sf_Compis/Proyecto Lexico/lexer-chilero/src/main/java/gt/edu/url/compiler/TokenConstants.java
+/media/sf_Compis/Proyecto Lexico/lexer-chilero/src/main/java/gt/edu/url/compiler/IdSymbol.java
+/media/sf_Compis/Proyecto Lexico/lexer-chilero/target/generated-sources/jflex/gt/edu/url/compiler/CoolLexer.java
+/media/sf_Compis/Proyecto Lexico/lexer-chilero/src/main/java/gt/edu/url/compiler/AbstractTable.java
+/media/sf_Compis/Proyecto Lexico/lexer-chilero/src/main/java/gt/edu/url/compiler/Flags.java
+/media/sf_Compis/Proyecto Lexico/lexer-chilero/src/main/java/gt/edu/url/compiler/StringSymbol.java
+/media/sf_Compis/Proyecto Lexico/lexer-chilero/src/main/java/gt/edu/url/compiler/App.java
+/media/sf_Compis/Proyecto Lexico/lexer-chilero/src/main/java/gt/edu/url/compiler/IntSymbol.java
+/media/sf_Compis/Proyecto Lexico/lexer-chilero/src/main/java/gt/edu/url/compiler/IdTable.java
